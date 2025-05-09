@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
-         float horizontalInput = Input.GetAxis("Horizontal");
+        float horizontalInput = Input.GetAxis("Horizontal");
         body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
 
         if (horizontalInput > 0.01f){
