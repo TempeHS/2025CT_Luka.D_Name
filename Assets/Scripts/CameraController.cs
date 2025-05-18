@@ -4,17 +4,33 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerialiseFIeld] private float speed;
-    private float currentPosX;
+    [SerializeField] private float smoothTime = 0.3f; // Smooth time for camera movement
+    [SerializeField] private Transform player; // Reference to the player
+
     private Vector3 velocity = Vector3.zero;
-    // Start is called before the first frame update
-    private void update
+    private float targetPosX; // Target X position for snapping to a room
+
+    private void Update()
     {
-        transform.position = Vector3.SmoothDamp(transform.position, new Vector3(currentPosX, transform.position.y, transform.position.z), ref velocity, speed * Time.deltaTime);
+        if (player != null)
+        {
+            // Smoothly move the camera to follow the player's position
+            Vector3 targetPosition = new Vector3(player.position.x, player.position.y, transform.position.z);
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        }
+    }
+
+    public void MoveToNewRoom(Transform newRoom)
+    {
+        if (newRoom != null)
+        {
+            // Snap the camera to the new room's position
+            targetPosX = newRoom.position.x;
+            transform.position = new Vector3(targetPosX, transform.position.y, transform.position.z);
+        }
+        else
+        {
+            Debug.LogWarning("MoveToNewRoom called with a null Transform.");
+        }
     }
 }
-
-    public void MoveToNewRoom(Transform_newRoom)
-    {
-    currentPosX = MoveToNewRoom.position.x;
-    }
