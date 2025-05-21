@@ -4,42 +4,73 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private float jumpForce;
-    [SerializeField] private LayerMask groundLayer;
+    private float horizontal;
+    private float speed = 8f;
+    private float jumpingPower = 16f;
+    private bool isFacingRight = true;
+
+    private bool isWallSliding;
+    private float wallSlidingSpeed = 2f;
+    [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private Transform wallCheck;
+    [SerializeField] private LayerMask wallLayer;
 
-    private Rigidbody2D body;
-    private bool isGrounded;
-
-    private void Awake()
+    void Update()
     {
-        body = GetComponent<Rigidbody2D>();
+        horizontal = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetButtonDown("Jump") && IsGrounded())
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+        }
+
+        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+        }
+
+        WallSlide();
+
+        Flip();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        // Horizontal movement
-        float horizontalInput = Input.GetAxis("Horizontal");
-        body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
+        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+    }
 
-        // Flip player sprite based on movement direction
-        if (horizontalInput > 0.01f)
+    private bool IsGrounded()
+    {
+        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
+    }
+
+    private bool IsWalled()
+    {
+        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+    }
+
+    private void WallSlide()
+    {
+        if (IsWalled() && !IsGrounded() && horizontal != 0f)
         {
-            transform.localScale = Vector3.one;
+            isWallSliding = true;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
         }
-        else if (horizontalInput < -0.01f)
+        else
         {
-            transform.localScale = new Vector3(-1, 1, 1);
+            isWallSliding = false;
         }
-
-        // Check if the player is grounded
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
-
-        // Jumping
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+    }
+    private void Flip()
+    {
+        if (isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
         {
-            body.velocity = new Vector2(body.velocity.x, jumpForce);
+            isFacingRight = !isFacingRight;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
         }
     }
 }
