@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class AttackArea : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private int damage = 3;
 
-    // Update is called once per frame
-    void Update()
+    private void OnTiggerEnter2D(Collider2D collision)
     {
-        
+        if (GetComponent<Collider>().GetComponent<Health>() != null)
+        {
+            Health health = GetComponent<Collider>().GetComponent<Health>();
+            health.Damage(damage);
+        }
     }
 }
