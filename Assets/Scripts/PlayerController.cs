@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using PlayerController;
 
 namespace PlayerControllerNamespace // Changed to avoid class/namespace name clash
 {
