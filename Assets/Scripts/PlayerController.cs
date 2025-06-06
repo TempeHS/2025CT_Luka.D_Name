@@ -13,6 +13,8 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
+        private bool _onWall;
+        private bool _wallDirection;
 
         #region Interface
 
@@ -103,7 +105,13 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
                 _frameLeftGrounded = _time;
                 GroundedChanged?.Invoke(false, 0);
             }
+            // Wall checks
+            bool wallLeft = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.left, _stats.GrounderDistance, ~_stats.PlayerLayer);
+            bool wallRight = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.right, _stats.GrounderDistance, ~_stats.PlayerLayer);
 
+            _onWall = (!_grounded && (wallLeft || wallRight));
+            _wallDirection = wallLeft ? -1 : (wallRight ? 1 : 0);
+// ...existing code...
             Physics2D.queriesStartInColliders = _cachedQueryStartInColliders;
         }
 
@@ -124,14 +132,32 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private void HandleJump()
         {
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
-
+ 
             if (!_jumpToConsume && !HasBufferedJump) return;
 
             if (_grounded || CanUseCoyote) ExecuteJump();
 
             _jumpToConsume = false;
+            {
+                ExecuteJump();
+            }
+                else if (_onWall)
+            {
+                ExecuteWallJump();
+            }
         }
 
+        private void ExecuteWallJump()
+    {
+        _endedJumpEarly = false;
+        _timeJumpWasPressed = 0;
+        _bufferedJumpUsable = false;
+        _coyoteUsable = false;
+     // Push away from wall and up
+        _frameVelocity.x = -_wallDirection * _stats.MaxSpeed;
+        _frameVelocity.y = _stats.JumpPower;
+        Jumped?.Invoke();
+    }
         private void ExecuteJump()
         {
             _endedJumpEarly = false;
@@ -169,12 +195,34 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             {
                 _frameVelocity.y = _stats.GroundingForce;
             }
+
+private void HandleGravity()
+{
+    if (_grounded && _frameVelocity.y <= 0f)
+    {
+        _frameVelocity.y = _stats.GroundingForce;
+    }
+    else if (_onWall && _frameVelocity.y < 0)
+    {
+        // Wall slide: limit fall speed
+        _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.MaxFallSpeed * 0.3f); // 30% of max fall speed
+    }
+    else
+    {
+        var inAirGravity = _stats.FallAcceleration;
+        if (_endedJumpEarly && _frameVelocity.y > 0) inAirGravity *= _stats.JumpEndEarlyGravityModifier;
+        _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.MaxFallSpeed, inAirGravity * Time.fixedDeltaTime);
+    }
+}
+
             else
             {
                 var inAirGravity = _stats.FallAcceleration;
                 if (_endedJumpEarly && _frameVelocity.y > 0) inAirGravity *= _stats.JumpEndEarlyGravityModifier;
                 _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.MaxFallSpeed, inAirGravity * Time.fixedDeltaTime);
             }
+
+            
         }
 
         #endregion
