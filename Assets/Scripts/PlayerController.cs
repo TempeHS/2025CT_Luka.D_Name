@@ -129,23 +129,24 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
         private bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
 
-        private void HandleJump()
-        {
-            if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
- 
-            if (!_jumpToConsume && !HasBufferedJump) return;
+    private void HandleJump()
+    {
+        if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0)
+        _endedJumpEarly = true;
 
-            if (_grounded || CanUseCoyote) ExecuteJump();
+        if (!_jumpToConsume && !HasBufferedJump) return;
 
-            _jumpToConsume = false;
-            {
-                ExecuteJump();
-            }
-                else if (_onWall)
-            {
-                ExecuteWallJump();
-            }
-        }
+        if (_grounded || CanUseCoyote)
+    {
+        ExecuteJump();
+    }
+        else if (_onWall)
+    {
+        ExecuteWallJump();
+    }
+
+        _jumpToConsume = false;
+}
 
         private void ExecuteWallJump()
     {
