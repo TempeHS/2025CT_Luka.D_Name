@@ -14,7 +14,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
         private bool _onWall;
-        private bool _wallDirection;
+        private int _wallDirection;
 
         #region Interface
 
@@ -196,34 +196,37 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             {
                 _frameVelocity.y = _stats.GroundingForce;
             }
+        }
 
-private void HandleGravity()
-{
-    if (_grounded && _frameVelocity.y <= 0f)
-    {
-        _frameVelocity.y = _stats.GroundingForce;
-    }
-    else if (_onWall && _frameVelocity.y < 0)
-    {
-        // Wall slide: limit fall speed
-        _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.MaxFallSpeed * 0.3f); // 30% of max fall speed
-    }
-    else
-    {
-        var inAirGravity = _stats.FallAcceleration;
-        if (_endedJumpEarly && _frameVelocity.y > 0) inAirGravity *= _stats.JumpEndEarlyGravityModifier;
-        _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.MaxFallSpeed, inAirGravity * Time.fixedDeltaTime);
-    }
-}
-
+        private void HandleGravity()
+        {
+            if (_grounded && _frameVelocity.y <= 0f)
+            {
+                _frameVelocity.y = _stats.GroundingForce;
+            }
+            else if (_onWall && _frameVelocity.y < 0)
+            {
+                // Wall slide: limit fall speed
+                _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.MaxFallSpeed * 0.3f); // 30% of max fall speed
+            }
             else
             {
                 var inAirGravity = _stats.FallAcceleration;
                 if (_endedJumpEarly && _frameVelocity.y > 0) inAirGravity *= _stats.JumpEndEarlyGravityModifier;
-                _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.MaxFallSpeed, inAirGravity * Time.fixedDeltaTime);
-            }
+                {
+                    _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.MaxFallSpeed, inAirGravity * Time.fixedDeltaTime);
+                }
 
-            
+
+                else
+                {
+                    var inAirGravity = _stats.FallAcceleration;
+                    if (_endedJumpEarly && _frameVelocity.y > 0) inAirGravity *= _stats.JumpEndEarlyGravityModifier;
+                    {
+                        _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.MaxFallSpeed, inAirGravity * Time.fixedDeltaTime);
+                    }
+                }
+            }
         }
 
         #endregion
