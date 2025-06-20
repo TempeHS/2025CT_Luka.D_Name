@@ -15,9 +15,15 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private bool _cachedQueryStartInColliders;
         private bool _onWall;
         private int _wallDirection;
+        private bool _dashing;
+        private float _dashStartTime;
+        private float _lastDashTime;
+
+        public float DashSpeed = 20f;
+        public float DashDuration = 0.2f;
+        public float DashCooldown = 0.5f;
 
         #region Interface
-
         public Vector2 FrameInput => _frameInput.Move;
         public event Action<bool, float> GroundedChanged;
         public event Action Jumped;
@@ -46,7 +52,8 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             {
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
-                Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
+                Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
+                DashPressed = Input.GetKeyDown(KeyCode.LeftShift)
             };
 
             if (_stats.SnapInput)
@@ -69,12 +76,42 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             HandleJump();
             HandleDirection();
             HandleGravity();
-            
+            HandleDash();
             ApplyMovement();
         }
 
+        private void HandleDash()
+        {
+            if (_dashing)
+            {
+                // End dash if time’s up
+                if (_time > _dashStartTime + _stats.DashDuration)
+                {
+                    _dashing = false;
+                }
+                else
+                {
+                    // Maintain dash velocity
+                    _frameVelocity = new Vector2(
+                    _frameInput.Move.x != 0 ? _frameInput.Move.x : transform.localScale.x,
+                    0
+                ) * _stats.DashSpeed;
+                    return; // Skip normal movement while dashing
+                }
+            }
+
+            // Start dash if button pressed and cooldown is over
+            if (_frameInput.DashPressed && _time > _lastDashTime + _stats.DashCooldown && !_dashing)
+            {
+                _dashing = true;
+                _dashStartTime = _time;
+                _lastDashTime = _time;
+            }
+        }
+
+
         #region Collisions
-        
+
         private float _frameLeftGrounded = float.MinValue;
         private bool _grounded;
 
@@ -111,7 +148,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
             _onWall = (!_grounded && (wallLeft || wallRight));
             _wallDirection = wallLeft ? -1 : (wallRight ? 1 : 0);
-// ...existing code...
+            // ...existing code...
             Physics2D.queriesStartInColliders = _cachedQueryStartInColliders;
         }
 
@@ -129,36 +166,36 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
         private bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
 
-    private void HandleJump()
-    {
-        if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0)
-        _endedJumpEarly = true;
+        private void HandleJump()
+        {
+            if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0)
+                _endedJumpEarly = true;
 
-        if (!_jumpToConsume && !HasBufferedJump) return;
+            if (!_jumpToConsume && !HasBufferedJump) return;
 
-        if (_grounded || CanUseCoyote)
-    {
-        ExecuteJump();
-    }
-        else if (_onWall)
-    {
-        ExecuteWallJump();
-    }
+            if (_grounded || CanUseCoyote)
+            {
+                ExecuteJump();
+            }
+            else if (_onWall)
+            {
+                ExecuteWallJump();
+            }
 
-        _jumpToConsume = false;
-}
+            _jumpToConsume = false;
+        }
 
         private void ExecuteWallJump()
-    {
-        _endedJumpEarly = false;
-        _timeJumpWasPressed = 0;
-        _bufferedJumpUsable = false;
-        _coyoteUsable = false;
-     // Push away from wall and up
-        _frameVelocity.x = -_wallDirection * _stats.MaxSpeed;
-        _frameVelocity.y = _stats.JumpPower;
-        Jumped?.Invoke();
-    }
+        {
+            _endedJumpEarly = false;
+            _timeJumpWasPressed = 0;
+            _bufferedJumpUsable = false;
+            _coyoteUsable = false;
+            // Push away from wall and up
+            _frameVelocity.x = -_wallDirection * _stats.MaxSpeed;
+            _frameVelocity.y = _stats.JumpPower;
+            Jumped?.Invoke();
+        }
         private void ExecuteJump()
         {
             _endedJumpEarly = false;
@@ -196,27 +233,26 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             {
                 _frameVelocity.y = _stats.GroundingForce;
             }
-                else if (_onWall && _frameVelocity.y < 0)
-                {
-                 _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.MaxFallSpeed * 0.3f);
-                }
-                    else
-                    {
-                        var inAirGravity = _stats.FallAcceleration;
-                        if (_endedJumpEarly && _frameVelocity.y > 0)
-                        inAirGravity *= _stats.JumpEndEarlyGravityModifier;
+            else if (_onWall && _frameVelocity.y < 0)
+            {
+                _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.MaxFallSpeed * 0.3f);
+            }
+            else
+            {
+                var inAirGravity = _stats.FallAcceleration;
+                if (_endedJumpEarly && _frameVelocity.y > 0)
+                    inAirGravity *= _stats.JumpEndEarlyGravityModifier;
 
-                        _frameVelocity.y = Mathf.MoveTowards(
-                        _frameVelocity.y,
-                        -_stats.MaxFallSpeed,
-                        inAirGravity * Time.fixedDeltaTime
-        );
-    }
-}
+                _frameVelocity.y = Mathf.MoveTowards(
+                _frameVelocity.y,
+                -_stats.MaxFallSpeed,
+                inAirGravity * Time.fixedDeltaTime
+);
+            }
+        }
 
 
         #endregion
-
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
 #if UNITY_EDITOR
@@ -231,7 +267,10 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
     {
         public bool JumpDown;
         public bool JumpHeld;
+
+        public bool DashPressed;
         public Vector2 Move;
+
     }
 
     public interface IPlayerController
