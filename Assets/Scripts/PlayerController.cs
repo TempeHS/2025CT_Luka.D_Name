@@ -18,7 +18,11 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private bool _dashing;
         private float _dashStartTime;
         private float _lastDashTime;
-
+        private bool _dashBuffered;
+        private float _timeDashWasBuffered;
+        private float _lastFacingDirection = 1f;
+        private bool CanDash => !_dashing && _time > _lastDashTime + _stats.DashCooldown;
+        private bool HasBufferedDash => _dashBuffered && _time < _timeDashWasBuffered;
         public float DashSpeed = 20f;
         public float DashDuration = 0.2f;
         public float DashCooldown = 0.5f;
@@ -67,6 +71,12 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
                 _jumpToConsume = true;
                 _timeJumpWasPressed = _time;
             }
+
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+{
+            _dashBuffered = true;
+            _timeDashWasBuffered = _time;
+}
         }
 
         private void FixedUpdate()
@@ -98,6 +108,14 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
                 ) * _stats.DashSpeed;
                     return; // Skip normal movement while dashing
                 }
+
+                    if (HasBufferedDash && CanDash)
+                    {
+                        _dashing = true;
+                        _dashStartTime = _time;
+                        _lastDashTime = _time;
+                        _dashBuffered = false;
+                    }
             }
 
             // Start dash if button pressed and cooldown is over
@@ -220,6 +238,16 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             else
             {
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
+            }
+
+            if (_frameInput.Move.x != 0)
+            {
+                _lastFacingDirection = Mathf.Sign(_frameInput.Move.x);
+
+             // Flip the character’s sprite by changing localScale
+                Vector3 scale = transform.localScale;
+                scale.x = _lastFacingDirection;
+                transform.localScale = scale;
             }
         }
 

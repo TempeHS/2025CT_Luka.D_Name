@@ -279,6 +279,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stats: {fileID: 11400000, guid: 3f2cdd54d3300b54ea92b799c7f73015, type: 2}
+  DashSpeed: 30
+  DashDuration: 0.3
+  DashCooldown: 0.1
 --- !u!50 &73163840
 Rigidbody2D:
   serializedVersion: 4
