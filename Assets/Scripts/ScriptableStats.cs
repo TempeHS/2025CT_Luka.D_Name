@@ -58,8 +58,8 @@ namespace PlayerController
         public float JumpBuffer = .2f;
         
         [Header("Dash Settings")]
-        public float DashSpeed = 20f;
-        public float DashDuration = 0.2f;
-        public float DashCooldown = 0.5f;
+        public float DashSpeed = 30f;
+        public float DashDuration = 0.5f;
+        public float DashCooldown = 0.1f;
     }
 }
