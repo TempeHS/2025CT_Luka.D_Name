@@ -60,6 +60,6 @@ namespace PlayerController
         [Header("Dash Settings")]
         public float DashSpeed = 30f;
         public float DashDuration = 0.5f;
-        public float DashCooldown = 0.1f;
+        public float DashCooldown = 1f;
     }
 }

@@ -92,40 +92,30 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         private void HandleDash()
         {
-            if (_dashing)
-            {
-                // End dash if time’s up
-                if (_time > _dashStartTime + _stats.DashDuration)
-                {
-                    _dashing = false;
-                }
-                else
-                {
-                    // Maintain dash velocity
-                    _frameVelocity = new Vector2(
-                    _frameInput.Move.x != 0 ? _frameInput.Move.x : transform.localScale.x,
-                    0
-                ) * _stats.DashSpeed;
-                    return; // Skip normal movement while dashing
-                }
-
-                    if (HasBufferedDash && CanDash)
-                    {
-                        _dashing = true;
-                        _dashStartTime = _time;
-                        _lastDashTime = _time;
-                        _dashBuffered = false;
-                    }
-            }
-
-            // Start dash if button pressed and cooldown is over
-            if (_frameInput.DashPressed && _time > _lastDashTime + _stats.DashCooldown && !_dashing)
+            // Begin dash if buffered or pressed and available
+            if ((HasBufferedDash || _frameInput.DashPressed) && CanDash)
             {
                 _dashing = true;
                 _dashStartTime = _time;
                 _lastDashTime = _time;
+                _dashBuffered = false;
+            }
+
+            // End dash if time’s up
+            if (_dashing && _time > _dashStartTime + _stats.DashDuration)
+                _dashing = false;
+
+            // Apply dash velocity while dashing
+            if (_dashing)
+            {
+                _frameVelocity = new Vector2(
+                _frameInput.Move.x != 0 ? _frameInput.Move.x : transform.localScale.x,
+                0
+               ) * _stats.DashSpeed;
+            return;
             }
         }
+
 
 
         #region Collisions
