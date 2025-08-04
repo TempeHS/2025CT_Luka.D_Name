@@ -26,7 +26,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         public float DashSpeed = 20f;
         public float DashDuration = 0.2f;
         public float DashCooldown = 0.5f;
-
+        private bool _wallSliding;
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
         public event Action<bool, float> GroundedChanged;
@@ -88,6 +88,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             HandleGravity();
             HandleDash();
             ApplyMovement();
+            HandleWallSlide();
         }
 
         private void HandleDash()
@@ -193,13 +194,23 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             _jumpToConsume = false;
         }
 
+        private void HandleWallSlide()
+        {
+            _wallSliding = false;
+
+            if (_onWall && !_grounded && _frameVelocity.y < 0 && _frameInput.Move.x == _wallDirection)
+            {
+                _wallSliding = true;
+                _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.WallSlideSpeed);
+            }
+        }
         private void ExecuteWallJump()
         {
             _endedJumpEarly = false;
             _timeJumpWasPressed = 0;
             _bufferedJumpUsable = false;
             _coyoteUsable = false;
-            // Push away from wall and up
+            // Jump away from wall and up
             _frameVelocity.x = -_wallDirection * _stats.MaxSpeed;
             _frameVelocity.y = _stats.JumpPower;
             Jumped?.Invoke();

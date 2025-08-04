@@ -56,10 +56,11 @@ namespace PlayerController
 
         [Tooltip("The amount of time we buffer a jump. This allows jump input before actually hitting the ground")]
         public float JumpBuffer = .2f;
-        
+
         [Header("Dash Settings")]
         public float DashSpeed = 30f;
         public float DashDuration = 0.5f;
         public float DashCooldown = 1f;
+        public float WallSlideSpeed = 2f;
     }
 }
