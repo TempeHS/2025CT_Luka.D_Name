@@ -22,10 +22,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private float _timeDashWasBuffered;
         private float _lastFacingDirection = 1f;
         private bool CanDash => !_dashing && _time > _lastDashTime + _stats.DashCooldown;
-        private bool HasBufferedDash => _dashBuffered && _time < _timeDashWasBuffered;
-        public float DashSpeed = 20f;
-        public float DashDuration = 0.2f;
-        public float DashCooldown = 0.5f;
+        private bool HasBufferedDash => _dashBuffered && _time < _timeDashWasBuffered + _stats.DashBuffer;
         private bool _wallSliding;
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
@@ -93,29 +90,37 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         private void HandleDash()
         {
-            // Begin dash if buffered or pressed and available
+        // Store input for buffering
+        if (_frameInput.DashPressed)
+        {
+            _dashBuffered = true;
+            _timeDashWasBuffered = _time;
+        }
+
+        // Start dash if allowed
             if ((HasBufferedDash || _frameInput.DashPressed) && CanDash)
             {
-                _dashing = true;
-                _dashStartTime = _time;
-                _lastDashTime = _time;
-                _dashBuffered = false;
-            }
-
-            // End dash if time’s up
-            if (_dashing && _time > _dashStartTime + _stats.DashDuration)
-                _dashing = false;
-
-            // Apply dash velocity while dashing
-            if (_dashing)
-            {
-                _frameVelocity = new Vector2(
-                _frameInput.Move.x != 0 ? _frameInput.Move.x : transform.localScale.x,
-                0
-               ) * _stats.DashSpeed;
-            return;
-            }
+            _dashing = true;
+            _dashStartTime = _time;
+            _lastDashTime = _time;
+            _dashBuffered = false; // Clear buffer on use
         }
+
+        // End dash if duration exceeded
+            if (_dashing && _time > _dashStartTime + _stats.DashDuration)
+            {
+            _dashing = false;
+            }
+
+        // Apply dash movement
+        if (_dashing)
+        {
+            float dashDir = _frameInput.Move.x != 0 ? Mathf.Sign(_frameInput.Move.x) : _lastFacingDirection;
+            _frameVelocity = new Vector2(dashDir * _stats.DashSpeed, 0f);
+            return; // Skip normal movement while dashing
+        }
+}
+
 
 
 
