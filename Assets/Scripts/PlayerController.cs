@@ -70,10 +70,10 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             }
 
             if (Input.GetKeyDown(KeyCode.LeftShift))
-{
-            _dashBuffered = true;
-            _timeDashWasBuffered = _time;
-}
+            {
+                _dashBuffered = true;
+                _timeDashWasBuffered = _time;
+            }
         }
 
         private void FixedUpdate()
@@ -90,36 +90,36 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         private void HandleDash()
         {
-        // Store input for buffering
-        if (_frameInput.DashPressed)
-        {
-            _dashBuffered = true;
-            _timeDashWasBuffered = _time;
-        }
-
-        // Start dash if allowed
-            if ((HasBufferedDash || _frameInput.DashPressed) && CanDash)
+            // Store input for buffering
+            if (_frameInput.DashPressed)
             {
-            _dashing = true;
-            _dashStartTime = _time;
-            _lastDashTime = _time;
-            _dashBuffered = false; // Clear buffer on use
-        }
-
-        // End dash if duration exceeded
-            if (_dashing && _time > _dashStartTime + _stats.DashDuration)
-            {
-            _dashing = false;
+                _dashBuffered = true;
+                _timeDashWasBuffered = _time;
             }
 
-        // Apply dash movement
-        if (_dashing)
-        {
-            float dashDir = _frameInput.Move.x != 0 ? Mathf.Sign(_frameInput.Move.x) : _lastFacingDirection;
-            _frameVelocity = new Vector2(dashDir * _stats.DashSpeed, 0f);
-            return; // Skip normal movement while dashing
+            // Start dash if allowed
+            if ((HasBufferedDash || _frameInput.DashPressed) && CanDash)
+            {
+                _dashing = true;
+                _dashStartTime = _time;
+                _lastDashTime = _time;
+                _dashBuffered = false; // Clear buffer on use
+            }
+
+            // End dash if duration exceeded
+            if (_dashing && _time > _dashStartTime + _stats.DashDuration)
+            {
+                _dashing = false;
+            }
+
+            // Apply dash movement
+            if (_dashing)
+            {
+                float dashDir = _frameInput.Move.x != 0 ? Mathf.Sign(_frameInput.Move.x) : _lastFacingDirection;
+                _frameVelocity = new Vector2(dashDir * _stats.DashSpeed, 0f);
+                return; // Skip normal movement while dashing
+            }
         }
-}
 
 
 
@@ -250,7 +250,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             {
                 _lastFacingDirection = Mathf.Sign(_frameInput.Move.x);
 
-             // Flip the character’s sprite by changing localScale
+                // Flip the character’s sprite by changing localScale
                 Vector3 scale = transform.localScale;
                 scale.x = _lastFacingDirection;
                 transform.localScale = scale;
@@ -314,4 +314,29 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         public event Action Jumped;
         public Vector2 FrameInput { get; }
     }
+
+    public class PlayerController : MonoBehaviour
+    {
+        // All your fields, methods, and logic go here
+        private Vector3 _startingPosition;
+
+        private void Start()
+        {
+            _startingPosition = transform.position;
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Hazard"))
+            {
+                ResetPlayerPosition();
+            }
+        }
+
+        private void ResetPlayerPosition()
+        {
+            transform.position = _startingPosition;
+        }
+}
+
 }

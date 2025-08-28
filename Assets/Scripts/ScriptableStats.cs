@@ -54,16 +54,20 @@ namespace PlayerController
         [Tooltip("The time before coyote jump becomes unusable. Coyote jump allows jump to execute even after leaving a ledge")]
         public float CoyoteTime = .15f;
 
-        [Tooltip("The amount of time we buffer a jump. This allows jump input before actually hitting the ground")]
+        [Tooltip("The amount of time to buffer a jump. This allows jump input before actually hitting the ground")]
         public float JumpBuffer = .2f;
 
         [Header("Dash Settings")]
-        public float DashSpeed = 15f;
+        public float DashSpeed = 20f;
+        //The speed of the dash.
         public float DashDuration = 0.5f;
+        //"The length of the dash
         public float DashCooldown = 1f;
-        [Tooltip("The amount of time we buffer a dash input")]
+        //The amount of time between possible dashes.
         public float DashBuffer = 0.15f;
+        //The amount of time we buffer a dashh input
         public float WallSlideSpeed = 2f;
+        //The speed of sliding down walls
 
     }
 }
