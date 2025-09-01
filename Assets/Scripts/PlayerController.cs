@@ -24,6 +24,8 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private bool CanDash => !_dashing && _time > _lastDashTime + _stats.DashCooldown;
         private bool HasBufferedDash => _dashBuffered && _time < _timeDashWasBuffered + _stats.DashBuffer;
         private bool _wallSliding;
+        private Vector3 _startingPosition;
+
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
         public event Action<bool, float> GroundedChanged;
@@ -33,6 +35,14 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         private float _time;
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Hazard"))
+        {
+            Debug.Log("Hazard touched! Resetting position.");
+            transform.position = _startingPosition;
+        }
+    }
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
@@ -288,13 +298,6 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         #endregion
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (_stats == null) Debug.LogWarning("Please assign a ScriptableStats asset to the Player Controller's Stats slot", this);
-        }
-#endif
     }
 
     public struct FrameInput
@@ -315,7 +318,8 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         public Vector2 FrameInput { get; }
     }
 
-    public class PlayerController : MonoBehaviour
+    #region Hazards and Enemies
+    public class HazardController : MonoBehaviour
     {
         // All your fields, methods, and logic go here
         private Vector3 _startingPosition;
@@ -327,16 +331,19 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            Debug.Log($"Triggered by: {other.name}, Tag: {other.tag}");
             if (other.CompareTag("Hazard"))
-            {
-                ResetPlayerPosition();
-            }
+
+                if (other.CompareTag("Hazard"))
+                {
+                    ResetPlayerPosition();
+                }
         }
 
         private void ResetPlayerPosition()
         {
             transform.position = _startingPosition;
         }
-}
-
+    }
+#endregion
 }
