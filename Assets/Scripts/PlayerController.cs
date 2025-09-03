@@ -47,7 +47,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         {
             _rb = GetComponent<Rigidbody2D>();
             _col = GetComponent<CapsuleCollider2D>();
-
+            _startingPosition = transform.position;
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
 
@@ -132,7 +132,7 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         }
 
 
-
+// private void int: larry's peenar explosion chamber
 
         #region Collisions
 
@@ -323,12 +323,6 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
     {
         // All your fields, methods, and logic go here
         private Vector3 _startingPosition;
-
-        private void Start()
-        {
-            _startingPosition = transform.position;
-        }
-
         private void OnTriggerEnter2D(Collider2D other)
         {
             Debug.Log($"Triggered by: {other.name}, Tag: {other.tag}");

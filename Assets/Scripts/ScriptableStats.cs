@@ -40,13 +40,13 @@ namespace PlayerController
 
         [Header("JUMP")]
         [Tooltip("The immediate velocity applied when jumping")]
-        public float JumpPower = 36;
+        public float JumpPower = 360;
 
         [Tooltip("The maximum vertical movement speed")]
-        public float MaxFallSpeed = 40;
+        public float MaxFallSpeed = 360;
 
         [Tooltip("The player's capacity to gain fall speed. a.k.a. In Air Gravity")]
-        public float FallAcceleration = 110;
+        public float FallAcceleration = 1;
 
         [Tooltip("The gravity multiplier added when jump is released early")]
         public float JumpEndEarlyGravityModifier = 3;
