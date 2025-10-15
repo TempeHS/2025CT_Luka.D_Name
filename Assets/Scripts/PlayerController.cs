@@ -131,9 +131,6 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
             }
         }
 
-
-// private void int: larry's peenar explosion chamber
-
         #region Collisions
 
         private float _frameLeftGrounded = float.MinValue;
@@ -172,7 +169,6 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
             _onWall = (!_grounded && (wallLeft || wallRight));
             _wallDirection = wallLeft ? -1 : (wallRight ? 1 : 0);
-            // ...existing code...
             Physics2D.queriesStartInColliders = _cachedQueryStartInColliders;
         }
 
@@ -192,11 +188,13 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
 
         private void HandleJump()
         {
+            // Jump Buffer
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0)
                 _endedJumpEarly = true;
 
             if (!_jumpToConsume && !HasBufferedJump) return;
 
+            // Coyote Jump and Wall Jump criteria
             if (_grounded || CanUseCoyote)
             {
                 ExecuteJump();
@@ -212,9 +210,10 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
         private void HandleWallSlide()
         {
             _wallSliding = false;
-
+            // Checks if the player is in contact with the Wall and moving in the direction of it
             if (_onWall && !_grounded && _frameVelocity.y < 0 && _frameInput.Move.x == _wallDirection)
             {
+            //if so then the Wallslide state becomes true
                 _wallSliding = true;
                 _frameVelocity.y = Mathf.Max(_frameVelocity.y, -_stats.WallSlideSpeed);
             }
@@ -321,7 +320,6 @@ namespace PlayerControllerNamespace // Changed to avoid class/namespace name cla
     #region Hazards and Enemies
     public class HazardController : MonoBehaviour
     {
-        // All your fields, methods, and logic go here
         private Vector3 _startingPosition;
         private void OnTriggerEnter2D(Collider2D other)
         {
