@@ -1,12 +1,25 @@
 # Soulbound Demo Development
 
-Simple overview of use/purpose.
+This project is a demo of a 2D platformer, the focus of this demo was on the development of a movement system which included several of the conventions of a modern platformer (variable jump, coyote jump, wall slide, dash) and make that system feel polished.
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+The game is in an unfinished state, including a movement system and basic hazards. 
 
-## Getting Started
+### Movement System
+
+**Jump**\
+The jump feature in Soulbound has variable length, increasing the height to a maximum based on how long the player holds the input. Other than 
+
+## User Documentation
+
+The controls are as follows:\
+**Press A or D** to move left and right respectively\
+**Press Space** to jump (must be touching the ground, wallsliding or meeting coyote jump criteria)\
+![Gif of neutral jump and walljump](Assets/ReadMeGifs/Wallclimb.gif)\
+**Hold Directional Key** in the direction of a wall while against it to wallslide\
+**Press Shift** to dash, movement will follow your current/last directional input
+
 
 ### Dependencies
 
