@@ -1,4 +1,21 @@
-# Soulbound Demo Development
+<h1 align="center">Soulbound Demo Development</h1>
+
+## Table of Contents
+
+- [Showcase](#Showcase)
+- [Description](#Desciption)
+  - [Story and Objective](#Story-and-Objective)
+  - [Movement System](#Movement-System)
+- [User Documentation](#User-Documentation)
+- [User Control Guide](#user-control-guide)
+- [Script Editing Software](#script-editing-software)
+- [Asset Showcase](#asset-showcase)
+- [Public Assets Used](#public-assets-used)
+- [Showcase of Works](#showcase-of-works)
+
+---
+
+## Showcase
 
 ## Description
 
@@ -38,6 +55,10 @@ The wallslide mechanic allows the player to hold on to or slide down (by letting
 
 The dash mechanic gives the player a large boost of horizontal speed following their last or current directional input.\
 ![Gif of wall slide](Assets/ReadMeGifs/Dash.gif)
+
+## Asset Showcase
+
+- [View All Assets](https://drive.google.com/drive/folders/13vOsTKjDch1WHjX5Mt0HZBoEc8y2vbCv)
 
 ### Dependencies
 
@@ -81,7 +102,7 @@ ex. [@benpaddlejones](https://github.com/benpaddlejones)
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the GNU Public License - see the LICENSE.md file for details
 
 ## Acknowledgments
 
