@@ -4,19 +4,18 @@
 
 - [Showcase](#Showcase)
 - [Description](#Desciption)
-  - [Story and Objective](#Story-and-Objective)
-  - [Movement System](#Movement-System)
 - [User Documentation](#User-Documentation)
-- [User Control Guide](#user-control-guide)
-- [Script Editing Software](#script-editing-software)
 - [Asset Showcase](#asset-showcase)
-- [Public Assets Used](#public-assets-used)
-- [Showcase of Works](#showcase-of-works)
+- [Help](#help)
+- [Authors](#authors)
+- [Licence](#license)
+- [Acknowledgements](#acknowledgments)
+
 
 ---
 
 ## Showcase
-
+<video controls src="Showcase.mp4" title="Title"></video>
 ## Description
 
 This project is a demo of a 2D platformer, the focus of this demo was on the development of a movement system which included several of the conventions of a modern platformer which make that system feel polished. The game is in an unfinished state, including a movement system and basic hazards. If I had more time to work on it, I would finish importing the sprites, effects and animations to replace the placeholders, make a more fulfilling map to navigate and implement the character switch mechanic from my development proposal.
@@ -27,7 +26,9 @@ While the story wasn't properly implemented, it was written originally with the 
 
 ### Movement System
 
-The movement system follows in the footsteps of other 2D platformers, including standard conventions like variable jump, coyote jump, wall slide, wall jump and a dash. The movement speed is very fast, encouraging precice jumps or quick thinking correction if the player misjudges.
+The movement system follows in the footsteps of other 2D platformers, including standard conventions like variable jump, coyote jump, wall slide, wall jump and a dash. The movement speed is very fast, encouraging precice jumps or quick thinking correction if the player misjudges./
+
+The most complicated features to implement was the variable jump and coyote jump the former allows the player variable jump height based on how long the input is held while the latter allows the player to jump even after leaving the ground as long as it is within a small time of becoming airborn.
 
 ## User Documentation
 
